@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "MRE Player",
+    "slug": "mre-player",
+    "version": "0.1.0",
+    "scheme": "mre-player",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.jordyfajardo.mreplayer"
+    },
+    "android": {
+      "package": "com.jordyfajardo.mreplayer"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-dev-client",
+      "expo-secure-store",
+      "expo-web-browser"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

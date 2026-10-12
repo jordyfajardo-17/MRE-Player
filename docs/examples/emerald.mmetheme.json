@@ -1,0 +1,24 @@
+{
+  "formatVersion": 1,
+  "id": "mre.emerald",
+  "name": "Emerald",
+  "version": "1.0.0",
+  "authorId": "mre.builtin",
+  "engineCompatibility": ">=1.0.0 <2.0.0",
+  "components": {
+    "layout": "dense",
+    "surface": "flat",
+    "navigation": "bottom-bar",
+    "player": "artwork-focus"
+  },
+  "tokens": {
+    "background": "#080D13",
+    "surface": "#15212D",
+    "accent": "#6AE4AC",
+    "text": "#F5F8FC",
+    "muted": "#AAB9C8",
+    "radiusDp": 24,
+    "blurIntensity": 0.6,
+    "surfaceOpacity": 0.8
+  }
+}
