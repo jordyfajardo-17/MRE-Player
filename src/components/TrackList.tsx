@@ -2,16 +2,21 @@ import { router } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 import type { Track } from '../music/core/types';
 import { useThemeStore } from '../theme/theme-store';
+import { usePlayer } from '../music/playback/player-store';
+import { useLibrary } from '../music/core/library';
+import { Artwork, Copy, IconButton } from './ui';
 export function TrackList({ tracks }: { tracks: Track[] }) {
-  const { tokens, components } = useThemeStore((state) => state.theme);
-  return <View style={{ gap: components.layout === 'dense' ? 8 : 16 }}>
-    {tracks.map((track, index) => <Pressable key={track.id} accessibilityRole="button" accessibilityLabel={`Ver ${track.title}, ${track.artist}`}
-      onPress={() => router.push({ pathname: '/player/[id]', params: { id: track.id } })}
-      style={({ pressed }) => ({ backgroundColor: tokens.surface, padding: components.layout === 'artwork' ? 24 : 16, borderRadius: tokens.radiusDp, opacity: pressed ? 0.7 : 1, flexDirection: 'row', alignItems: 'center', gap: 16 })}>
-      <View style={{ backgroundColor: tokens.accent, width: 48, height: 48, borderRadius: Math.min(tokens.radiusDp, 12), alignItems: 'center', justifyContent: 'center' }}><Text style={{ color: tokens.background, fontSize: 20 }}>{index + 1}</Text></View>
-      <View style={{ flex: 1, gap: 4 }}><Text style={{ color: tokens.text, fontSize: 17, fontWeight: '600' }}>{track.title}</Text><Text style={{ color: tokens.muted }}>{track.artist}</Text></View>
-      <Text style={{ color: tokens.muted }}>›</Text>
-    </Pressable>)}
-    {!tracks.length && <Text style={{ color: tokens.muted }}>No encontramos pistas en el catálogo de demostración.</Text>}
+  const { tokens, components } = useThemeStore(s => s.theme);
+  const active = usePlayer(s => s.track?.id); const favorites = useLibrary(s => s.favorites);
+  return <View style={{ gap: components.layout === 'dense' ? 4 : 12 }}>
+    {tracks.map((track, index) => <View key={`${track.id}-${index}`} style={{ padding: 8, paddingVertical: components.layout === 'dense' ? 6 : 12, backgroundColor: active === track.id ? `${tokens.accent}16` : tokens.surface, borderRadius: Math.min(tokens.radiusDp, 18), flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+      <Pressable accessibilityRole="button" accessibilityLabel={`Reproducir ${track.title}, ${track.artist}`} onPress={() => { usePlayer.getState().play(track, tracks); router.push({ pathname: '/player/[id]', params: { id: track.id } }); }} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56 }}>
+        <Artwork track={track} size={components.layout === 'artwork' ? 68 : 50} />
+        <View style={{ flex: 1, gap: 5 }}><Text numberOfLines={1} style={{ color: active === track.id ? tokens.accent : tokens.text, fontSize: 15, fontWeight: '600' }}>{track.title}</Text><Text numberOfLines={1} style={{ color: tokens.muted, fontSize: 12 }}>{track.artist} · {track.providerId === 'local' ? 'Archivo propio' : 'Audius'}</Text></View>
+      </Pressable>
+      <IconButton icon={favorites.some(t => t.id === track.id) ? 'heart' : 'heart-outline'} label={`Favorito: ${track.title}`} active={favorites.some(t => t.id === track.id)} onPress={() => useLibrary.getState().favorite(track)} size={19} />
+      <IconButton icon="add" label={`Añadir a la cola: ${track.title}`} onPress={() => usePlayer.getState().enqueue(track)} size={20} />
+    </View>)}
+    {!tracks.length && <Copy>No hay pistas aquí todavía.</Copy>}
   </View>;
 }

@@ -1,13 +1,15 @@
-# Siguientes pasos
+# Alcance de escucha y pendientes
 
-1. Ejecutar esta base en Android y comprobar navegación, importación y persistencia.
-2. Comprobar la build de iOS y las diferencias de efecto y accesibilidad.
-3. Elegir el proveedor inicial mediante una prueba de OAuth y reproducción autorizada.
-4. Implementar un adaptador de reproducción, interrupciones y controles de sistema compatibles.
-5. Desarrollar superficies glass con detección de plataforma y reducción de transparencia.
-6. Ampliar el editor y el formato de temas con recursos y recuperación de versiones.
-7. Configurar el registro común del paquete de temas o extraerlo a un repositorio compartido.
-8. Definir backend, cuentas, catálogo gratuito y flujo de revisión.
-9. Resolver licencias de componentes y modelo de venta antes de añadir pagos.
+La guía 1.0 mezcla decisiones acordadas, propuestas y funciones futuras. La petición actual prioriza Player y excluye la tienda. Audius permite probar un catálogo reproducible sin credenciales de Spotify, Apple o Google.
 
-Las comisiones, precios, países y pagos a creadores siguen por decidir según la guía 1.0.
+Implementado: catálogo real, búsqueda, reproducción directa, importación local, navegación, mini player, cola, favoritos, historial, playlists y personalización con los tres presets.
+
+Pendientes que impiden llamar a esta rama una aplicación de producción completa:
+
+1. Registrar las apps de Spotify, Google y Apple; implementar y probar OAuth, renovación/revocación y los SDK oficiales. Guardar credenciales privadas en servidor o SecureStore según el caso; nunca en EXPO_PUBLIC.
+2. Probar en Android/iOS: segundo plano, pantalla bloqueada, Bluetooth, interrupciones, permisos, importación y almacenamiento, redes lentas y modo avión. La app no solicita micrófono.
+3. Extender temas a paquetes con recursos, instalación/versionado y recuperación; revisar contraste de temas importados. El esquema actual sigue siendo JSON v1.
+4. Definir sincronización y cuenta MRE, aislamiento de extensiones declarativas y capacidades por proveedor.
+5. Más adelante: letras con una fuente autorizada, Android Auto, gestos avanzados, continuidad entre proveedores y el marketplace.
+
+No se implementa un sustituto de los SDK comerciales usando URLs extraídas. YouTube requerirá video visible y no ofrecerá audio separado ni fondo oculto.

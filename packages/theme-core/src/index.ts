@@ -95,8 +95,8 @@ function preset(id: string, name: string, accent: string, surface: MusicTheme['c
   return validateTheme({
     formatVersion: 1, id: `mre.${id}`, name, version: '1.0.0', authorId: 'mre.builtin',
     engineCompatibility: '>=1.0.0 <2.0.0',
-    components: { layout, surface, navigation: surface === 'flat' ? 'bottom-bar' : 'floating-pill', player: 'artwork-focus' },
-    tokens: { background: '#080D13', surface: '#15212D', accent, text: '#F5F8FC', muted: '#AAB9C8', radiusDp: 24, blurIntensity: 0.6, surfaceOpacity: 0.8 },
+    components: { layout, surface, navigation: surface === 'flat' ? 'bottom-bar' : 'floating-pill', player: id === 'wave' ? 'immersive' : id === 'emerald' ? 'minimal' : 'artwork-focus' },
+    tokens: { background: id === 'emerald' ? '#090D0B' : id === 'wave' ? '#160F14' : '#0D1322', surface: id === 'emerald' ? '#17211B' : id === 'wave' ? '#2E2029' : '#202D44', accent, text: '#F5F8FC', muted: '#AAB9C8', radiusDp: 24, blurIntensity: 0.6, surfaceOpacity: 0.8 },
   });
 }
 export const themePresets: readonly MusicTheme[] = [
@@ -105,3 +105,4 @@ export const themePresets: readonly MusicTheme[] = [
   preset('wave', 'Material Wave', '#FDBD91', 'flat', 'compact'),
 ];
 export function defaultTheme(): MusicTheme { return validateTheme(themePresets[0]); }
+

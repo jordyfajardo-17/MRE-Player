@@ -5,12 +5,13 @@ import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { releasePlayer } from '../music/playback/player-store';
 import { useThemeStore } from '../theme/theme-store';
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 60_000 } } });
 export default function RootLayout() {
   const { theme, hydrated, hydrate } = useThemeStore();
-  useEffect(() => { void hydrate(); }, [hydrate]);
+  useEffect(() => { void hydrate(); return releasePlayer; }, [hydrate]);
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: theme.tokens.background }}>
       <SafeAreaProvider>
@@ -18,10 +19,11 @@ export default function RootLayout() {
           <StatusBar style="light" />
           {hydrated ? <Stack screenOptions={{ headerStyle: { backgroundColor: theme.tokens.background }, headerTintColor: theme.tokens.text, contentStyle: { backgroundColor: theme.tokens.background } }}>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="player/[id]" options={{ title: 'Detalle de la pista' }} />
+            <Stack.Screen name="player/[id]" options={{ title: 'Reproductor', presentation: 'modal' }} />
           </Stack> : <View style={{ flex: 1, justifyContent: 'center' }}><ActivityIndicator accessibilityLabel="Cargando tema" color={theme.tokens.accent} /></View>}
         </QueryClientProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }
+
