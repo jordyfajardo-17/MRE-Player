@@ -22,14 +22,20 @@ La configuración habilita audio de fondo y no solicita micrófono. No se ha fir
 
 ## Experiencia disponible
 
-- Inicio con tendencias y carátulas reales de Audius; búsqueda por artista y canción con cancelación de consultas y estados de error.
-- Reproducción de pistas públicas habilitadas en Audius e importación de archivos de audio propios.
+- Inicio y búsqueda combinados de Audius y Archivo abierto, filtros de fuente/estilo, carga de más páginas y fallos parciales sin descartar el catálogo disponible.
+- Reproducción de pistas públicas habilitadas en Audius, música con licencias declaradas de Internet Archive e importación de archivos de audio propios.
 - Reproductor y minirreproductor con posición, pausa, anterior/siguiente, volumen, aleatorio, repetición y temporizador.
 - Cola con selección, reordenación y eliminación; favoritos, historial y playlists locales.
 - Archivos copiados a almacenamiento permanente de la app en Android/iOS. En web, los archivos seleccionados duran la sesión y no se guardan como enlaces caducados.
 - Emerald, Liquid Glass y Material Wave: estructura, paleta, navegación y reproductor distintos. Combinación de componentes, acento, vista previa, guardar/cancelar e importación de JSON validado.
-- Liquid Glass nativo cuando está disponible; blur en iOS/web y superficie simplificada en Android. Se respeta reducir transparencia. No se usan animaciones automáticas.
+- Superficies de cristal con reflejos y contraste, Liquid Glass nativo compatible y blur en Android 12+, iOS y web. Android anterior usa una alternativa sin blur costoso.
+- Barra inferior con cápsula que sigue la pestaña y permite deslizar; botones con respuesta de resorte.
+- Desliza hacia arriba el mini player para expandir el reproductor y hacia abajo desde su asa para recogerlo. También hay botones y cierre con Atrás/Escape. El audio no se recrea al abrir/cerrar. Se respetan reducir movimiento y transparencia.
 - Compartir enlace de una canción y abrir su página original.
+
+## Archivo abierto
+
+La segunda fuente consulta la API oficial de Internet Archive, con búsqueda de items musicales y lectura de archivos MP3. Se filtran las declaraciones CC0 y CC BY 4.0 tanto en la búsqueda como en la metadata del item; no se muestran archivos privados ni items restringidos. Cada pista conserva artista, licencia y página original. Las declaraciones las publica el proveedor; no equivalen a una verificación independiente de titularidad. No es un reemplazo del catálogo comercial de las grandes plataformas.
 
 ## Límites explícitos
 
@@ -49,6 +55,12 @@ npm run doctor
 npm run export:web
 ```
 
-Las pruebas cubren validación del tema, fuentes, normalización y restricciones de Audius, errores, cola, cambios de pista, liberación del motor y temporizador. La exportación web y los bundles móviles no sustituyen pruebas físicas.
+Para comprobar el proveedor en vivo, incluyendo una lectura parcial del stream sin descargar la canción completa:
+
+```sh
+MRE_LIVE_API_CHECK=1 npm test -- src/music/sources/live.smoke.test.ts
+```
+
+La prueba de red está desactivada en CI para no depender de la disponibilidad externa. Las pruebas cubren validación del tema, fuentes, normalización y restricciones de Audius, errores, cola, cambios de pista, liberación del motor y temporizador. La exportación web y los bundles móviles no sustituyen pruebas físicas.
 
 Consulta [alcance y pendientes](docs/next-steps.md) y [referencias visuales](docs/design-references.md).

@@ -1,5 +1,6 @@
 import Slider from '@react-native-community/slider';
 import { useLocalSearchParams } from 'expo-router';
+import { sourceLabels } from '../../music/sources/catalog';
 import { useState } from 'react';
 import { Linking, Share, Text, View, useWindowDimensions } from 'react-native';
 import { Screen } from '../../components/Screen';
@@ -7,14 +8,15 @@ import { Action, Artwork, Copy, IconButton, Label, Surface, time } from '../../c
 import { usePlayer } from '../../music/playback/player-store';
 import { useLibrary } from '../../music/core/library';
 import { useThemeStore } from '../../theme/theme-store';
-export function TrackScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>(); const p = usePlayer(); const library = useLibrary();
+export function PlayerContent({ id: requestedId }: { id?: string }) {
+  const p = usePlayer(); const library = useLibrary();
+  const id = requestedId ?? p.track?.id;
   const { tokens, components } = useThemeStore(s => s.theme); const { width } = useWindowDimensions(); const [panel, setPanel] = useState('queue'); const [notice, setNotice] = useState('');
   const track = p.track?.id === id ? p.track : [...library.recent, ...library.favorites, ...library.local, ...p.queue].find(t => t.id === id);
-  if (!track) return <Screen title="Pista no disponible" subtitle="Busca una canción en el catálogo para escucharla."><Copy>La pista no está en esta sesión.</Copy></Screen>;
-  if (p.track?.id !== track.id) return <Screen title={track.title} subtitle={track.artist}><Artwork track={track} size={Math.min(width - 48, 340)} /><Action onPress={() => p.play(track)}>Reproducir</Action></Screen>;
-  const liked = library.favorites.some(t => t.id === track.id); const size = Math.min(width - 64, components.player === 'minimal' ? 170 : components.player === 'immersive' ? 390 : 310);
-  return <Screen title="Ahora suena" subtitle={`${track.providerId === 'local' ? 'TU ARCHIVO' : 'AUDIUS'} · ${track.genre ?? 'Tu selección'}`}>
+  if (!track) return <Copy>Busca una canción en el catálogo para escucharla.</Copy>;
+  if (p.track?.id !== track.id) return <View style={{ gap: 20 }}><Artwork track={track} size={Math.min(width - 48, 340)} /><Action onPress={() => p.play(track)}>Reproducir</Action></View>;
+  const liked = library.favorites.some(t => t.id === track.id); const size = Math.min(width - 96, components.player === 'minimal' ? 170 : components.player === 'immersive' ? 390 : 310);
+  return <View style={{ gap: 20 }}><Copy>{sourceLabels[track.providerId] ?? track.providerId} · {track.genre ?? 'Tu selección'}</Copy>
     <Surface style={{ padding: components.player === 'immersive' ? 8 : 20, alignItems: 'center', alignSelf: 'center' }}><Artwork track={track} size={size} /></Surface>
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}><View style={{ flex: 1, gap: 6 }}><Label>{track.title}</Label><Copy>{track.artist}</Copy></View><IconButton icon={liked ? 'heart' : 'heart-outline'} label={liked ? 'Quitar de favoritos' : 'Añadir a favoritos'} active={liked} onPress={() => library.favorite(track)} /></View>
     <View><Slider accessibilityLabel="Posición de reproducción" minimumValue={0} maximumValue={p.duration || 1} value={Math.min(p.position, p.duration)} onSlidingComplete={p.seek} minimumTrackTintColor={tokens.accent} maximumTrackTintColor={tokens.surface} thumbTintColor={tokens.text} /><View style={{ flexDirection: 'row', justifyContent: 'space-between' }}><Copy>{time(p.position)}</Copy><Copy>{time(p.duration)}</Copy></View></View>
@@ -31,6 +33,11 @@ export function TrackScreen() {
     {panel === 'queue' && <><Label>A continuación · {p.queue.length}</Label>{p.queue.map((t, index) => <Surface key={`${t.id}-${index}`} style={{ padding: 10 }}><View style={{ flexDirection: 'row', alignItems: 'center' }}><View style={{ flex: 1 }}><Text numberOfLines={1} style={{ color: index === p.index ? tokens.accent : tokens.text }}>{index + 1}. {t.title}</Text><Copy>{t.artist}</Copy></View><IconButton icon="play" label={`Escuchar ${t.title}`} onPress={() => p.play(t, p.queue)} /><IconButton icon="arrow-up" label={`Subir ${t.title}`} onPress={() => p.move(index, -1)} />{index !== p.index && <IconButton icon="close" label={`Quitar ${t.title}`} onPress={() => p.remove(index)} />}</View></Surface>)}</>}
     {panel === 'playlist' && <><Label>Guardar en playlist</Label>{!library.playlists.length && <Copy>Crea una playlist en Biblioteca y vuelve aquí para añadir canciones.</Copy>}{library.playlists.map(list => <Action secondary key={list.id} onPress={() => { library.addToPlaylist(list.id, track); setNotice(`Guardada en ${list.name}`); }}>{list.name}</Action>)}{!!notice && <Copy>{notice}</Copy>}</>}
     {panel === 'sleep' && <><Label>Duerme con música</Label><Copy>{p.sleepAt ? `Se pausará a las ${new Date(p.sleepAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'Pausa automática desactivada'}</Copy>{[15, 30, 60, 0].map(m => <Action secondary key={m} onPress={() => p.sleep(m)}>{m ? `${m} minutos` : 'Desactivar'}</Action>)}</>}
-    {panel === 'info' && <><Copy>Las letras no están disponibles en esta fuente.</Copy>{track.url && <><Action secondary onPress={() => void Linking.openURL(track.url!).catch(() => setNotice('No se pudo abrir el enlace.'))}>Ver artista y canción en Audius</Action><Action secondary onPress={() => void Share.share({ message: `${track.title} — ${track.artist}\n${track.url}` }).catch(() => setNotice('No se pudo compartir.'))}>Compartir canción</Action></>}{!!notice && <Copy>{notice}</Copy>}</>}
-  </Screen>;
+    {panel === 'info' && <><Copy>Las letras no están disponibles en esta fuente.</Copy>{track.licenseLabel && track.licenseUrl && <><Copy>{track.licenseLabel} · {track.artist}</Copy><Action secondary onPress={() => void Linking.openURL(track.licenseUrl!).catch(() => setNotice('No se pudo abrir la licencia.'))}>Consultar licencia declarada</Action></>}{track.url && <><Action secondary onPress={() => void Linking.openURL(track.url!).catch(() => setNotice('No se pudo abrir el enlace.'))}>Ver la pista en su fuente</Action><Action secondary onPress={() => void Share.share({ message: `${track.title} — ${track.artist}\n${track.url}` }).catch(() => setNotice('No se pudo compartir.'))}>Compartir canción</Action></>}{!!notice && <Copy>{notice}</Copy>}</>}
+  </View>;
+}
+
+export function TrackScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  return <Screen title="Ahora suena" subtitle="Tu selección musical"><PlayerContent id={id} /></Screen>;
 }
