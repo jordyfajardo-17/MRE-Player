@@ -18,3 +18,14 @@ Revisión: 18 de octubre de 2026. Los presets tienen nombre e identidad propios.
 - API del catálogo y streaming: https://docs.audius.co/api/
 
 La API de iTunes se evaluó y no se utilizó como fuente de entretenimiento: sus previews tienen finalidad promocional. El catálogo reproducible elegido es Audius.
+
+## Segunda iteración de cristal
+
+Revisión 22 de octubre de 2026. El material se aplica a listas, controles, paneles y navegación, con una cápsula de selección deslizante y un reproductor expansible por gesto. La reproducción permanece en su propio store; la presentación solo altera dimensiones, posición y contenido visual.
+
+Android usa BlurTargetView sobre el fondo ambiental, separado de las superficies que lo consumen para evitar captura recursiva. Se usa dimezisBlurViewSdk31Plus para reservar blur eficiente a Android 12 o superior. En iOS compatible se utiliza GlassView; el fallback emplea BlurView y capas translúcidas. Reducir transparencia fuerza superficies sólidas. Reducir movimiento elimina las transiciones programadas; los botones siguen disponibles sin gestos.
+
+Se evita opacidad cero en ancestros de GlassView por la limitación documentada de Expo. Los controles de desplazamiento y volumen no comparten el detector vertical: solo el mini player y el asa de expansión reconocen ese gesto.
+
+- Gestos y valores compartidos: https://docs.swmansion.com/react-native-reanimated/docs/core/useSharedValue/
+- Spring: https://docs.swmansion.com/react-native-reanimated/docs/animations/withSpring/

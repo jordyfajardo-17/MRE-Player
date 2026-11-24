@@ -16,7 +16,7 @@ export function parseAudiusTrack(value: unknown): Track | null {
 }
 export const audiusSource: MusicSource = {
   id: 'audius', name: 'Audius', capabilities: { search: true, playlists: false, playback: true, backgroundPlayback: true },
-  async search(query, signal) {
+  async search(query, signal, options) {
     const path = query.trim() ? `/tracks/search?query=${encodeURIComponent(query.trim())}` : '/tracks/trending?time=week';
     const controller = new AbortController();
     const cancel = () => controller.abort();
@@ -24,7 +24,8 @@ export const audiusSource: MusicSource = {
     signal?.addEventListener('abort', cancel);
     const timeout = setTimeout(cancel, 15000);
     try {
-    const response = await fetch(`${AUDIUS_API}${path}&limit=40&app_name=MREPlayer`, { signal: controller.signal });
+    const offset = (Math.max(1, Math.floor(options?.page ?? 1)) - 1) * 40;
+    const response = await fetch(`${AUDIUS_API}${path}&limit=40&offset=${offset}&app_name=MREPlayer`, { signal: controller.signal });
     if (!response.ok) throw new Error(response.status === 429 ? 'Audius está recibiendo muchas consultas. Intenta más tarde.' : 'No se pudo consultar Audius. Intenta de nuevo.');
     const body: unknown = await response.json();
     if (!body || typeof body !== 'object' || !('data' in body) || !Array.isArray(body.data)) throw new Error('La fuente devolvió una respuesta no válida.');

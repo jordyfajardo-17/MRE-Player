@@ -1,6 +1,7 @@
 import type { MusicSource } from '../core/types';
 import { demoSource } from './demo';
 import { audiusSource } from './audius';
+import { archiveSource } from './archive';
 export class SourceRegistry {
   private readonly sources = new Map<string, MusicSource>();
   register(source: MusicSource): void {
@@ -17,3 +18,4 @@ export const sourceRegistry = new SourceRegistry();
 sourceRegistry.register(demoSource);
 
 sourceRegistry.register(audiusSource);
+sourceRegistry.register(archiveSource);
